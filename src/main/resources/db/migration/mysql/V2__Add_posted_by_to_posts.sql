@@ -1,0 +1,2 @@
+ALTER TABLE posts
+ADD COLUMN posted_by VARCHAR(255);
