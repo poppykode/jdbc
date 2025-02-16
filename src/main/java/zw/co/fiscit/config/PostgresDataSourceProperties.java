@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "cockroach.datasource")
+@ConfigurationProperties(prefix = "postgres.datasource")
 public class PostgresDataSourceProperties {
     private String url;
     private String username;

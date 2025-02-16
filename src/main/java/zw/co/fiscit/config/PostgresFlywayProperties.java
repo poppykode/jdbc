@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "flyway.cockroach")
-public class CockroachFlywayProperties {
+@ConfigurationProperties(prefix = "flyway.postgres")
+public class PostgresFlywayProperties {
     private boolean enabled;
     private String[] locations;
     private boolean baselineOnMigrate;

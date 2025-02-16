@@ -17,8 +17,8 @@ public class DataSourceConfig {
         this.postgresProperties = postgresProperties;
     }
 
-    @Bean(name = "cockroachDataSource")
-    public DataSource cockroachDataSource(){
+    @Bean(name = "mysqlDataSource")
+    public DataSource mysqlDataSource(){
         return DataSourceBuilder.create()
                 .driverClassName(mysqlProperties.getDriverClassName())
                 .url(mysqlProperties.getUrl())
@@ -27,8 +27,9 @@ public class DataSourceConfig {
                 .build();
     }
 
-    @Bean(name = "mysqlDataSource")
-    public DataSource mysqlDataSource(){
+
+    @Bean(name = "postgresDataSource")
+    public DataSource postgresDataSource(){
         return DataSourceBuilder.create()
                 .driverClassName(postgresProperties.getDriverClassName())
                 .url(postgresProperties.getUrl())

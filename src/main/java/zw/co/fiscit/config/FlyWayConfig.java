@@ -11,18 +11,18 @@ import javax.sql.DataSource;
 @Configuration
 public class FlyWayConfig {
     @Autowired
-    private CockroachFlywayProperties cockroachFlywayProperties;
+    private PostgresFlywayProperties postgresFlywayProperties;
 
     @Autowired
     private MysqlFlywayProperties mysqlFlywayProperties;
 
     @Bean(initMethod = "migrate")
-    public Flyway cockroachFlyway(@Qualifier("cockroachDataSource") DataSource dataSource) {
+    public Flyway postgresFlyway(@Qualifier("postgresDataSource") DataSource dataSource) {
         return Flyway.configure()
                 .dataSource(dataSource)
-                .locations(cockroachFlywayProperties.getLocations())
-                .baselineOnMigrate(cockroachFlywayProperties.isBaselineOnMigrate())
-                .placeholderReplacement(cockroachFlywayProperties.isPlaceholderReplacement())
+                .locations(postgresFlywayProperties.getLocations())
+                .baselineOnMigrate(postgresFlywayProperties.isBaselineOnMigrate())
+                .placeholderReplacement(postgresFlywayProperties.isPlaceholderReplacement())
                 .load();
     }
 
