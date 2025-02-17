@@ -1,32 +1,32 @@
 package zw.co.fiscit.services;
 
 import org.springframework.stereotype.Service;
-import zw.co.fiscit.model.Blog;
-import zw.co.fiscit.repository.BlogRepository;
+import zw.co.fiscit.model.Post;
+import zw.co.fiscit.repository.PostRepository;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
-public class BlogService {
+public class PostService {
 
-    private final BlogRepository blogRepository;
+    private final PostRepository postRepository;
 
-    public BlogService(BlogRepository blogRepository) {
-        this.blogRepository = blogRepository;
+    public PostService(PostRepository postRepository) {
+        this.postRepository = postRepository;
     }
 
     public Map<String, Object> findAllPaginatedPosts(Integer page, Integer pageSize){
-        int totalPosts = blogRepository.blogCount();
+        int totalPosts = postRepository.blogCount();
         Map<String, Object> response = new HashMap<>();
 
         if (page == null && pageSize == null) {
-            List<Blog> allPosts = blogRepository.findAllBlogs();
+            List<Post> allPosts = postRepository.findAllBlogs();
             response.put("posts", allPosts);
             response.put("totalPosts", totalPosts);
         } else {
-            List<Blog> allPaginatedPosts = blogRepository.findAllPaginatedBlogs(page, pageSize);
+            List<Post> allPaginatedPosts = postRepository.findAllPaginatedBlogs(page, pageSize);
             int totalPages = (int) Math.ceil((double) totalPosts / pageSize);
             response.put("posts", allPaginatedPosts);
             response.put("currentPage", page);

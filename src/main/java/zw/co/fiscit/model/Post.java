@@ -1,12 +1,12 @@
 package zw.co.fiscit.model;
 
-public class Blog {
+public class Post {
     private Long id;
     private String title;
     private String content;
     private String postedBy;
 
-    public Blog() {
+    public Post() {
     }
 
     public Long getId() {
