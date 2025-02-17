@@ -7,8 +7,10 @@ import java.util.List;
 public interface BlogRepository {
     List<Blog> findAllBlogs();
     List<Blog> findAllPaginatedBlogs(Integer page, Integer pageSize);
-    Blog findByBlogById(String customerCode);
+    Blog findByBlogById(Long blogId);
     Integer blogCount();
+    Blog save(Blog blog);
+
 
 
 }
