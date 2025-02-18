@@ -8,10 +8,14 @@ import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import zw.co.fiscit.exception.JdbcException;
 import zw.co.fiscit.model.Post;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @Repository
@@ -37,19 +41,21 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public List<Post> findAllPaginatedBlogs(Integer page, Integer pageSize) {
+        if(page <= 0)
+            throw new JdbcException("page size has to be greater than 0.", HttpStatus.BAD_REQUEST);
         int offset = (page - 1) * pageSize;
-        String sql = String.format("SELECT * from %s.posts LIMIT ? OFFSET ?", mysqlDb);
-        return mysqlJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Post.class),pageSize,offset);
+        String sql = "SELECT * FROM " + mysqlDb + ".posts LIMIT " + pageSize + " OFFSET " + offset;
+        return mysqlJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Post.class));
     }
 
     @Override
     public Post findByBlogById(Long blogId) {
-        String sql =String.format("SELECT * FROM %s.posts WHERE \"id\" = ?",mysqlDb);
+        String sql =String.format("SELECT * FROM %s.posts WHERE `id` = ?",mysqlDb);
         try {
             return mysqlJdbcTemplate.queryForObject(sql,
                     BeanPropertyRowMapper.newInstance(Post.class),blogId);
-        } catch (IncorrectResultSizeDataAccessException e) {
-            return null;
+        } catch (Exception e) {
+            throw new JdbcException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
     }
@@ -67,10 +73,19 @@ public class PostRepositoryImpl implements PostRepository {
             if (count > 0) {
                 throw new JdbcException("A post with the title '" + post.getTitle() + "' already exists.", HttpStatus.CONFLICT);
             }
-            String sql = "INSERT INTO "+mysqlDb+".posts (`title`,`content`) VALUES (?,?)";
+            String sql = "INSERT INTO "+mysqlDb+".posts (`title`,`content`,`posted_by`) VALUES (?,?,?)";
             LOGGER.info("sql: "+ sql);
-            int id = mysqlJdbcTemplate.update(sql, post.getTitle(), post.getContent());
-            post.setId((long) id);
+
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            mysqlJdbcTemplate.update(connection -> {
+                PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, post.getTitle());
+                ps.setString(2, post.getContent());
+                ps.setString(3, post.getPostedBy());
+                return ps;
+            }, keyHolder);
+
+            post.setId(keyHolder.getKey().longValue());
             return post;
 
         }catch (Exception e){
