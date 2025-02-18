@@ -13,6 +13,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import zw.co.fiscit.exception.JdbcException;
 import zw.co.fiscit.model.Post;
+import zw.co.fiscit.services.CommentService;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -25,17 +26,21 @@ public class PostRepositoryImpl implements PostRepository {
     @Value("${MYSQL_DATABASE_NAME}")
     private String mysqlDb;
     private final JdbcTemplate mysqlJdbcTemplate;
+    private final CommentService commentService;
 
     private final Logger LOGGER = LoggerFactory.getLogger(PostRepositoryImpl.class);
 
-    public PostRepositoryImpl(@Qualifier("mysqlJdbcTemplate") JdbcTemplate mysqlJdbcTemplate) {
+    public PostRepositoryImpl(@Qualifier("mysqlJdbcTemplate") JdbcTemplate mysqlJdbcTemplate, CommentService commentService) {
         this.mysqlJdbcTemplate = mysqlJdbcTemplate;
+        this.commentService = commentService;
     }
 
     @Override
     public List<Post> findAllBlogs() {
        String sql = String.format("SELECT * FROM %s.posts",mysqlDb);
-       return mysqlJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Post.class));
+        List<Post> posts = mysqlJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Post.class));
+        addCommentsToPost(posts);
+        r
     }
 
     @Override
@@ -44,7 +49,15 @@ public class PostRepositoryImpl implements PostRepository {
             throw new JdbcException("page size has to be greater than 0.", HttpStatus.BAD_REQUEST);
         int offset = (page - 1) * pageSize;
         String sql = "SELECT * FROM " + mysqlDb + ".posts LIMIT " + pageSize + " OFFSET " + offset;
-        return mysqlJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Post.class));
+        List<Post> posts = mysqlJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Post.class));
+        addCommentsToPost(posts);
+        return posts;
+    }
+
+    private void addCommentsToPost(List<Post> posts) {
+        posts.forEach(post -> {
+            post.setComments(commentService.findByPostId(post.getId()));
+        });
     }
 
     @Override

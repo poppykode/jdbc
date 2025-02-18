@@ -33,16 +33,17 @@ public class CommentRepositoryImpl implements CommentRepository {
             String sql = "INSERT INTO "+postgresDb+".comments (post_id, content) VALUES (?, ?) RETURNING id";
             Long generateId = postgresJdbcTemplate.queryForObject(sql, Long.class, comment.getPostId(), comment.getContent());
             comment.setId(generateId);
+            return comment;
         }catch (Exception e){
             LOGGER.info("error: "+e.getMessage());
+            return null;
         }
-        return comment;
     }
 
     @Override
     public void deleteCommentById(Long id) {
         try{
-            String sql = "DELETE FROM "+postgresDb+".comments WHERE 'id' = ?";
+            String sql = "DELETE FROM "+postgresDb+".comments WHERE id = ?";
             postgresJdbcTemplate.update(sql, id);
         }catch (Exception e){
             LOGGER.info("error: "+e.getMessage());
@@ -52,7 +53,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     @Override
     public List<Comment> findByPostId(Long postId) {
         try{
-        String sql = "SELECT * FROM "+postgresDb+".comments WHERE `post_id` = ?";
+        String sql = "SELECT * FROM "+postgresDb+".comments WHERE post_id = ?";
         return postgresJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Comment.class),postId);
         }catch (Exception e){
             LOGGER.info("error: "+e.getMessage());
