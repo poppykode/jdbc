@@ -10,7 +10,6 @@ public interface PostRepository {
     Post findByBlogById(Long blogId);
     Integer blogCount();
     Post save(Post post);
-
-
+    Integer getCount(Post post);
 
 }

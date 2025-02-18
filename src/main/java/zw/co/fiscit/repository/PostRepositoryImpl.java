@@ -63,6 +63,10 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public Post save(Post post) {
         try{
+            int count = getCount(post);
+            if (count > 0) {
+                throw new JdbcException("A post with the title '" + post.getTitle() + "' already exists.", HttpStatus.CONFLICT);
+            }
             String sql = "INSERT INTO "+mysqlDb+".posts (`title`,`content`) VALUES (?,?)";
             LOGGER.info("sql: "+ sql);
             int id = mysqlJdbcTemplate.update(sql, post.getTitle(), post.getContent());
@@ -74,4 +78,12 @@ public class PostRepositoryImpl implements PostRepository {
         }
 
     }
+
+    @Override
+    public Integer getCount(Post post) {
+        String checkSql = "SELECT COUNT(*) FROM " + mysqlDb + ".posts WHERE `title` = ?";
+        return mysqlJdbcTemplate.queryForObject(checkSql, Integer.class, post.getTitle());
+    }
+
+
 }
