@@ -1,11 +1,15 @@
 package zw.co.fiscit.repository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import zw.co.fiscit.exception.JdbcException;
 import zw.co.fiscit.model.Post;
 
 import java.util.List;
@@ -18,6 +22,8 @@ public class PostRepositoryImpl implements PostRepository {
     @Value("${MYSQL_DATABASE_NAME}")
     private String mysqlDb;
     private final JdbcTemplate mysqlJdbcTemplate;
+
+    private final Logger LOGGER = LoggerFactory.getLogger(PostRepositoryImpl.class);
 
     public PostRepositoryImpl(@Qualifier("mysqlJdbcTemplate") JdbcTemplate mysqlJdbcTemplate) {
         this.mysqlJdbcTemplate = mysqlJdbcTemplate;
@@ -56,9 +62,16 @@ public class PostRepositoryImpl implements PostRepository {
 
     @Override
     public Post save(Post post) {
-        String sql = String.format("INSERT INTO %s.posts (\"title\", \"content\") VALUES (?,?)", mysqlDb);
-        int id = mysqlJdbcTemplate.update(sql, post.getTitle(), post.getContent());
-        post.setId((long) id);
-        return post;
+        try{
+            String sql = "INSERT INTO "+mysqlDb+".posts (`title`,`content`) VALUES (?,?)";
+            LOGGER.info("sql: "+ sql);
+            int id = mysqlJdbcTemplate.update(sql, post.getTitle(), post.getContent());
+            post.setId((long) id);
+            return post;
+
+        }catch (Exception e){
+            throw new JdbcException(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+
     }
 }

@@ -1,10 +1,9 @@
 package zw.co.fiscit.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import zw.co.fiscit.model.Post;
 import zw.co.fiscit.services.PostService;
 
 import java.util.Map;
@@ -21,6 +20,11 @@ public class PostController {
     public ResponseEntity<Map<String, Object>> posts(@RequestParam(required = false) Integer page,
                                                          @RequestParam(required = false) Integer pageSize){
         return ResponseEntity.ok(postService.findAllPaginatedPosts(page,pageSize));
+    }
+
+    @PostMapping
+    public ResponseEntity<Post> save(@RequestBody Post post) {
+        return new ResponseEntity<>(postService.save(post), HttpStatus.CREATED);
     }
 
 
