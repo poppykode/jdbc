@@ -76,4 +76,3 @@ The API documentation is available at: `http://localhost:1989/swagger-ui.html` (
 
 Flyway migrations are located in the `src/main/resources/db/migration/mysql and src/main/resources/db/migration/postgres` directory.  The migrations are automatically applied when the application starts.
 
-## Project Structure
