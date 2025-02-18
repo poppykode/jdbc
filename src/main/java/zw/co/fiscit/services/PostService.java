@@ -40,4 +40,8 @@ public class PostService {
     public Post save(Post post) {
         return postRepository.save(post);
     }
+
+    public Post findByBlogById(Long blogId) {
+        return postRepository.findByBlogById(blogId);
+    }
 }

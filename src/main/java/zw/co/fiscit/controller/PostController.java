@@ -27,5 +27,10 @@ public class PostController {
         return new ResponseEntity<>(postService.save(post), HttpStatus.CREATED);
     }
 
+    @GetMapping("/{blogId}")
+    public ResponseEntity<Post>  findByBlogById(@PathVariable Long blogId){
+        return ResponseEntity.ok(postService.findByBlogById(blogId));
+    }
+
 
 }

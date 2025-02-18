@@ -38,9 +38,7 @@ public class PostRepositoryImpl implements PostRepository {
     @Override
     public List<Post> findAllBlogs() {
        String sql = String.format("SELECT * FROM %s.posts",mysqlDb);
-        List<Post> posts = mysqlJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Post.class));
-        addCommentsToPost(posts);
-        r
+        return mysqlJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Post.class));
     }
 
     @Override
@@ -49,11 +47,10 @@ public class PostRepositoryImpl implements PostRepository {
             throw new JdbcException("page size has to be greater than 0.", HttpStatus.BAD_REQUEST);
         int offset = (page - 1) * pageSize;
         String sql = "SELECT * FROM " + mysqlDb + ".posts LIMIT " + pageSize + " OFFSET " + offset;
-        List<Post> posts = mysqlJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Post.class));
-        addCommentsToPost(posts);
-        return posts;
+        return mysqlJdbcTemplate.query(sql, BeanPropertyRowMapper.newInstance(Post.class));
     }
 
+//    this is for adding comments to a list of posts
     private void addCommentsToPost(List<Post> posts) {
         posts.forEach(post -> {
             post.setComments(commentService.findByPostId(post.getId()));
@@ -64,8 +61,10 @@ public class PostRepositoryImpl implements PostRepository {
     public Post findByBlogById(Long blogId) {
         String sql =String.format("SELECT * FROM %s.posts WHERE `id` = ?",mysqlDb);
         try {
-            return mysqlJdbcTemplate.queryForObject(sql,
-                    BeanPropertyRowMapper.newInstance(Post.class),blogId);
+            Post post = mysqlJdbcTemplate.queryForObject(sql,
+                    BeanPropertyRowMapper.newInstance(Post.class), blogId);
+            post.setComments(commentService.findByPostId(post.getId()));
+            return post;
         } catch (Exception e) {
             throw new JdbcException(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
