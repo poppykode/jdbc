@@ -21,8 +21,7 @@ import java.util.List;
 @Repository
 
 public class PostRepositoryImpl implements PostRepository {
-    @Value("${POSTGRES_DATABASE_NAME}")
-    private String postgresDb;
+
     @Value("${MYSQL_DATABASE_NAME}")
     private String mysqlDb;
     private final JdbcTemplate mysqlJdbcTemplate;

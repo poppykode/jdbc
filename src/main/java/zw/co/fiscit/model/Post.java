@@ -1,10 +1,13 @@
 package zw.co.fiscit.model;
 
+import java.util.List;
+
 public class Post {
     private Long id;
     private String title;
     private String content;
     private String postedBy;
+    private List<Comment> comments;
 
     public Post() {
     }
@@ -39,5 +42,13 @@ public class Post {
 
     public void setPostedBy(String postedBy) {
         this.postedBy = postedBy;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }
